@@ -601,10 +601,16 @@ if 'show_channel_analysis' not in st.session_state:
     st.session_state['show_channel_analysis'] = False
 if 'show_channel_ai_analysis' not in st.session_state:
     st.session_state['show_channel_ai_analysis'] = False
+if 'kpi_ai_analysis_text' not in st.session_state:
+    st.session_state['kpi_ai_analysis_text'] = None
+if 'trend_ai_analysis_text' not in st.session_state:
+    st.session_state['trend_ai_analysis_text'] = None
+if 'channel_ai_analysis_text' not in st.session_state:
+    st.session_state['channel_ai_analysis_text'] = None
 if 'last_filter_key' not in st.session_state:
     st.session_state['last_filter_key'] = current_filter_key
 
-# 필터가 변경되면 이전의 분석 코멘트 박스를 모두 리셋(False)
+# 필터가 변경되면 이전의 분석 코멘트 박스를 모두 리셋(False) 및 캐시 초기화
 if st.session_state['last_filter_key'] != current_filter_key:
     st.session_state['show_kpi_analysis'] = False
     st.session_state['show_kpi_ai_analysis'] = False
@@ -612,6 +618,9 @@ if st.session_state['last_filter_key'] != current_filter_key:
     st.session_state['show_trend_ai_analysis'] = False
     st.session_state['show_channel_analysis'] = False
     st.session_state['show_channel_ai_analysis'] = False
+    st.session_state['kpi_ai_analysis_text'] = None
+    st.session_state['trend_ai_analysis_text'] = None
+    st.session_state['channel_ai_analysis_text'] = None
     st.session_state['last_filter_key'] = current_filter_key
 
 # 메인 헤더 타이틀
@@ -701,6 +710,16 @@ with left_col:
     with kpi_btn2:
         if st.button("🤖 AI 상세분석", key="kpi_ai_btn"):
             st.session_state['show_kpi_ai_analysis'] = not st.session_state['show_kpi_ai_analysis']
+            if st.session_state['show_kpi_ai_analysis'] and st.session_state['kpi_ai_analysis_text'] is None:
+                if not api_key:
+                    st.warning("먼저 좌측 사이드바에 Gemini API Key를 입력해주세요.")
+                else:
+                    kpi_data = {
+                        "핵심지표": ["총 광고비용", "총 노출수", "총 클릭수", "평균 CTR", "평균 CPC", "총 전환수", "총 전환가치", "종합 ROAS", "평균 CPA"],
+                        "값": [f"₩{total_spend:,.0f}", f"{total_impressions:,.0f}", f"{total_clicks:,.0f}", f"{overall_ctr:.2f}%", f"₩{overall_cpc:,.0f}", f"{total_conversions:,.0f}", f"₩{total_conv_value:,.0f}", f"{overall_roas:.2f}%", f"₩{overall_cpa:,.0f}"]
+                    }
+                    kpi_df_md = pd.DataFrame(kpi_data).to_markdown(index=False)
+                    st.session_state['kpi_ai_analysis_text'] = get_gemini_analysis(api_key, kpi_df_md, "전체 핵심 KPI 성과 요약")
             
     if st.session_state['show_kpi_analysis']:
         target_roas = 3000.0
@@ -711,18 +730,8 @@ with left_col:
         - 누적 광고비 **₩{total_spend:,.0f}** 소진을 통해 최종 전환 가치 **₩{total_conv_value:,.0f}**를 달성했습니다.
         """)
         
-    if st.session_state['show_kpi_ai_analysis']:
-        if not api_key:
-            st.warning("먼저 좌측 사이드바에 Gemini API Key를 입력해주세요.")
-        else:
-            kpi_data = {
-                "핵심지표": ["총 광고비용", "총 노출수", "총 클릭수", "평균 CTR", "평균 CPC", "총 전환수", "총 전환가치", "종합 ROAS", "평균 CPA"],
-                "값": [f"₩{total_spend:,.0f}", f"{total_impressions:,.0f}", f"{total_clicks:,.0f}", f"{overall_ctr:.2f}%", f"₩{overall_cpc:,.0f}", f"{total_conversions:,.0f}", f"₩{total_conv_value:,.0f}", f"{overall_roas:.2f}%", f"₩{overall_cpa:,.0f}"]
-            }
-            kpi_df_md = pd.DataFrame(kpi_data).to_markdown(index=False)
-            ai_res = get_gemini_analysis(api_key, kpi_df_md, "전체 핵심 KPI 성과 요약")
-            if ai_res:
-                st.info(f"✨ **[AI 분석 리포트] 핵심 KPI 요약 분석**\n\n{ai_res}")
+    if st.session_state['show_kpi_ai_analysis'] and st.session_state['kpi_ai_analysis_text'] is not None:
+        st.info(f"✨ **[AI 분석 리포트] 핵심 KPI 요약 분석**\n\n{st.session_state['kpi_ai_analysis_text']}")
                 
     st.write("") # 간격 조절
 
@@ -834,6 +843,12 @@ with left_col:
     with trend_btn2:
         if st.button("🤖 AI 상세분석", key="trend_ai_btn"):
             st.session_state['show_trend_ai_analysis'] = not st.session_state['show_trend_ai_analysis']
+            if st.session_state['show_trend_ai_analysis'] and st.session_state['trend_ai_analysis_text'] is None:
+                if not api_key:
+                    st.warning("먼저 좌측 사이드바에 Gemini API Key를 입력해주세요.")
+                else:
+                    trend_md = daily_df[['날짜', '광고비용', '전환수', 'ROAS']].to_markdown(index=False)
+                    st.session_state['trend_ai_analysis_text'] = get_gemini_analysis(api_key, trend_md, "일별 광고비용 및 ROAS 성과 추이")
             
     if st.session_state['show_trend_analysis']:
         unique_dates = sorted(filtered_df['날짜'].unique())
@@ -887,14 +902,8 @@ with left_col:
             - {advice}
             """)
             
-    if st.session_state['show_trend_ai_analysis']:
-        if not api_key:
-            st.warning("먼저 좌측 사이드바에 Gemini API Key를 입력해주세요.")
-        else:
-            trend_md = daily_df[['날짜', '광고비용', '전환수', 'ROAS']].to_markdown(index=False)
-            ai_res = get_gemini_analysis(api_key, trend_md, "일별 광고비용 및 ROAS 성과 추이")
-            if ai_res:
-                st.info(f"✨ **[AI 분석 리포트] 트렌드 성과 분석**\n\n{ai_res}")
+    if st.session_state['show_trend_ai_analysis'] and st.session_state['trend_ai_analysis_text'] is not None:
+        st.info(f"✨ **[AI 분석 리포트] 트렌드 성과 분석**\n\n{st.session_state['trend_ai_analysis_text']}")
                 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -999,6 +1008,12 @@ with left_col:
     with channel_btn2:
         if st.button("🤖 AI 상세분석", key="channel_ai_btn"):
             st.session_state['show_channel_ai_analysis'] = not st.session_state['show_channel_ai_analysis']
+            if st.session_state['show_channel_ai_analysis'] and st.session_state['channel_ai_analysis_text'] is None:
+                if not api_key:
+                    st.warning("먼저 좌측 사이드바에 Gemini API Key를 입력해주세요.")
+                else:
+                    mix_md = "### 매체별 성과\n" + media_spend.to_markdown(index=False) + "\n\n### 광고유형별 성과\n" + sada_group.to_markdown(index=False)
+                    st.session_state['channel_ai_analysis_text'] = get_gemini_analysis(api_key, mix_md, "매체 및 광고유형(SA/DA)별 비중/효율 리밸런싱")
             
     if st.session_state['show_channel_analysis']:
         media_metrics = filtered_df.groupby('매체').agg({
@@ -1032,14 +1047,8 @@ with left_col:
         - 높은 효율성을 기록 중인 **{max_roas_media}** 매체로 예산을 리밸런싱하여 캠페인 전반의 통합 믹스 효율 극대화를 제안합니다.
         """)
         
-    if st.session_state['show_channel_ai_analysis']:
-        if not api_key:
-            st.warning("먼저 좌측 사이드바에 Gemini API Key를 입력해주세요.")
-        else:
-            mix_md = "### 매체별 성과\n" + media_spend.to_markdown(index=False) + "\n\n### 광고유형별 성과\n" + sada_group.to_markdown(index=False)
-            ai_res = get_gemini_analysis(api_key, mix_md, "매체 및 광고유형(SA/DA)별 비중/효율 리밸런싱")
-            if ai_res:
-                st.info(f"✨ **[AI 분석 리포트] 채널 믹스 및 효율 분석**\n\n{ai_res}")
+    if st.session_state['show_channel_ai_analysis'] and st.session_state['channel_ai_analysis_text'] is not None:
+        st.info(f"✨ **[AI 분석 리포트] 채널 믹스 및 효율 분석**\n\n{st.session_state['channel_ai_analysis_text']}")
                 
     st.markdown('</div>', unsafe_allow_html=True)
 
