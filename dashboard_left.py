@@ -83,7 +83,7 @@ def render_dashboard(filtered_df, start_date, end_date, selected_media, selected
         """)
                 
     # 7. 성과 트렌드 분석 영역 (Trend Charts)
-    st.markdown("### 📈 실시간 성과 트렌드 분석 (Performance Trend Analysis)")
+    st.markdown("### 📈 실시간 성과 트렌드 분석  \n(Performance Trend Analysis)")
     
     # 시계열 차트를 위한 일별 데이터 집계
     daily_df = filtered_df.groupby('날짜').agg({
@@ -103,7 +103,7 @@ def render_dashboard(filtered_df, start_date, end_date, selected_media, selected
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### 🔹 일별 광고비용 vs 전환수 추이 (Spend vs Conversions)")
+        st.markdown("#### 🔹 일별 광고비용 vs 전환수 추이  \n(Spend vs Conversions)")
         # 이중 축 차트 구성 (바: 광고비용, 라인: 전환수)
         fig_trend = make_subplots(specs=[[{"secondary_y": True}]])
         
@@ -145,7 +145,7 @@ def render_dashboard(filtered_df, start_date, end_date, selected_media, selected
         st.plotly_chart(fig_trend, use_container_width=True)
         
     with col2:
-        st.markdown("#### 🔹 일별 ROAS 트렌드 추이 (Daily ROAS Trend)")
+        st.markdown("#### 🔹 일별 ROAS 트렌드 추이  \n(Daily ROAS Trend)")
         
         fig_roas = qs.Figure()
         
@@ -247,12 +247,12 @@ def render_dashboard(filtered_df, start_date, end_date, selected_media, selected
                 
     # 8. 매체 및 유형별 비중 분석 (Composition Analysis)
     st.markdown("---")
-    st.markdown("### 📊 비중 및 성과 비교 분석 (Composition & Comparison)")
+    st.markdown("### 📊 비중 및 성과 비교 분석  \n(Composition & Comparison)")
     
     col3, col4 = st.columns(2)
     
     with col3:
-        st.markdown("#### 🔹 매체별 광고비 집행 비중 (Share of Voice by Media)")
+        st.markdown("#### 🔹 매체별 광고비 집행 비중  \n(Share of Voice by Media)")
         
         # 매체별 광고비 합계
         media_spend = filtered_df.groupby('매체')['광고비용'].sum().reset_index()
@@ -281,7 +281,7 @@ def render_dashboard(filtered_df, start_date, end_date, selected_media, selected
         st.plotly_chart(fig_media, use_container_width=True)
         
     with col4:
-        st.markdown("#### 🔹 SA vs DA 성과 비교 분석 (SA vs DA Performance)")
+        st.markdown("#### 🔹 SA vs DA 성과 비교 분석  \n(SA vs DA Performance)")
         
         # SA/DA 비교 지표 선택 셀렉트박스
         metric_choice = st.selectbox(
@@ -385,7 +385,7 @@ def render_dashboard(filtered_df, start_date, end_date, selected_media, selected
                 
     # 9. 상세 데이터 테이블 (Detailed View)
     st.markdown("---")
-    st.markdown("### 📋 성과 상세 데이터 (Detailed Performance Log)")
+    st.markdown("### 📋 성과 상세 데이터  \n(Detailed Performance Log)")
     
     # 다운로드 및 정렬용 정밀 필터링 테이블
     table_display_df = filtered_df.copy()

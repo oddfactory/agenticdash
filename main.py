@@ -69,7 +69,7 @@ st.markdown("""
     }
     
     .kpi-value {
-        font-size: 1.7rem;
+        font-size: 1.45rem;
         font-weight: 800;
         color: #FFFFFF; /* 완전한 흰색으로 수치 가독성 극대화 */
         margin-bottom: 4px;
@@ -308,14 +308,14 @@ except Exception as e:
     st.stop()
 
 # 3. 사이드바 - 필터링 컨트롤 구성
-st.sidebar.markdown("# 📊 필터 패널 (Filters)")
+st.sidebar.markdown('<h1 style="font-size: 2.0rem; font-weight: 800; margin-bottom: 0px; line-height: 1.2;">📊 에이전틱 대시보드</h1><div style="font-size: 1.0rem; color: #94A3B8; margin-bottom: 15px;">Agentic Dashboard</div>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 # 날짜 범위 설정
 min_date = raw_df['날짜'].min().date()
 max_date = raw_df['날짜'].max().date()
 
-st.sidebar.subheader("📅 분석 기간 설정 (Date Range)")
+st.sidebar.subheader("📅 분석 기간 설정  \n(Date Range)")
 date_range = st.sidebar.date_input(
     "조회 기간",
     value=(min_date, max_date),
@@ -325,7 +325,7 @@ date_range = st.sidebar.date_input(
 )
 
 # 매체 선택
-st.sidebar.subheader("📺 매체 (Media)")
+st.sidebar.subheader("📺 매체  \n(Media)")
 all_media = sorted(raw_df['매체'].unique())
 selected_media = st.sidebar.multiselect(
     "분석할 매체를 선택하세요",
@@ -334,7 +334,7 @@ selected_media = st.sidebar.multiselect(
 )
 
 # 광고 유형 선택
-st.sidebar.subheader("🏷️ 광고 유형 (Type)")
+st.sidebar.subheader("🏷️ 광고 유형  \n(Type)")
 all_types = sorted(raw_df['SA/DA'].unique())
 selected_types = st.sidebar.multiselect(
     "광고 유형을 선택하세요",
@@ -411,7 +411,7 @@ st.markdown('<div class="main-title">Real-time Marketing Performance Dashboard</
 st.markdown('<div class="sub-title">10년차 시니어 AE의 인사이트가 담긴 실시간 매체 통합 분석 플랫폼</div>', unsafe_allow_html=True)
 
 # 화면 3분할 레이아웃 적용 (좌측 대시보드 70% : 우측 AI 비서 챗봇 30%)
-left_col, right_col = st.columns([0.7, 0.3])
+left_col, right_col = st.columns([0.7, 0.3], gap="large")
 
 # 좌측 시각화 대시보드 호출 이식
 with left_col:
