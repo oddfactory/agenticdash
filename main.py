@@ -342,11 +342,21 @@ selected_types = st.sidebar.multiselect(
     default=all_types
 )
 
-# 사이드바 API Key 입력 모듈 추가
+# 1. secrets 에서 가져오기 시도
+api_key = st.secrets.get("GEMINI_API_KEY", "")
+
+# 2. secrets에 없거나 비어있는 경우, 사이드바에서 입력받기
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔑 AI Config")
-api_key = st.sidebar.text_input("Gemini API Key 입력", type="password")
-st.sidebar.caption("💡 API Key는 서버에 저장되지 않고 로컬 브라우저 세션에만 안전하게 유지됩니다.")
+if api_key:
+    st.sidebar.success("🔑 API Key가 st.secrets를 통해 로드되었습니다.")
+    override_key = st.sidebar.text_input("Gemini API Key 변경 (st.secrets 재정의)", type="password", help="secrets에 설정된 API Key 대신 다른 키를 사용하려면 입력하세요.")
+    if override_key:
+        api_key = override_key
+else:
+    api_key = st.sidebar.text_input("Gemini API Key 입력", type="password", help="Gemini API Key를 입력하거나 .streamlit/secrets.toml 파일에 GEMINI_API_KEY를 등록해 주세요.")
+    st.sidebar.caption("💡 API Key는 서버에 저장되지 않고 로컬 브라우저 세션에만 안전하게 유지됩니다.")
+
 
 # 날짜 범위 입력값 검증 (조회 기간이 온전히 설정되었는지 확인)
 if isinstance(date_range, tuple) and len(date_range) == 2:
