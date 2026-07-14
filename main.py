@@ -517,7 +517,7 @@ except Exception as e:
     st.stop()
 
 # 3. 사이드바 - 필터링 컨트롤 구성
-st.sidebar.markdown('<h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0px; line-height: 1.2;">📊 에이전틱 대시보드</h1><div style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 15px;">Agentic Dashboard</div>', unsafe_allow_html=True)
+st.sidebar.markdown('<h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0px; line-height: 1.2;">📊 에이전틱<br>대시보드</h1><div style="font-size: 0.85rem; color: #94A3B8; margin-top: 5px; margin-bottom: 15px;">Agentic Dashboard</div>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 # 날짜 범위 설정
@@ -619,7 +619,7 @@ st.markdown('<div class="main-title">Real-time Marketing Performance Dashboard</
 st.markdown('<div class="sub-title">프리미엄 다크 테마와 10년차 시니어 AE의 분석 로직이 결합된 에이전틱 대시보드</div>', unsafe_allow_html=True)
 
 # 70% (대시보드) vs 30% (AI 챗봇) 화면 분할 레이아웃
-left_col, right_col = st.columns([0.7, 0.3], gap="large")
+left_col, right_col = st.columns([0.75, 0.25], gap="large")
 
 # 좌측 시각화 대시보드 구현
 with left_col:
@@ -1086,7 +1086,7 @@ with right_col:
         ]
         
     # Streamlit 네이티브 스크롤 고정형 컨테이너 적용 (대시보드와 독립)
-    with st.container(height=550):
+    with st.container(height=420):
         for msg in st.session_state['chat_messages']:
             with st.chat_message(msg["role"]):
                 st.write(msg["content"])
